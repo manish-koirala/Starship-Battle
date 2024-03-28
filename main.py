@@ -1,12 +1,16 @@
 import pygame as pg
 from sys import exit as sysexit
+from time import sleep as timesleep
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
 from button import PlayButton
+from stats import Stats
+from scoreboard import ScoreBoard
 
 class StarshipBattle:
+    """A class that represents the main game."""
     def __init__(self):
         pg.init()
         self.settings = Settings()
@@ -21,6 +25,9 @@ class StarshipBattle:
         self.bullets = pg.sprite.Group()
         self.aliens = pg.sprite.Group()
         self.play_btn = PlayButton(self)
+        self.stats = Stats(self)
+        self.scoreboard = ScoreBoard(self)
+        self._create_fleet()
 
     def run_game(self):
         """Run the game."""
@@ -33,7 +40,9 @@ class StarshipBattle:
                 # Update the alien fleet.
                 self._update_fleet()
                 # Detect the collision between alien and bullets.
-                self._detect_collision()
+                self._detect_collisions()
+                # Update the game stats.
+                self._update_game_stats()
             # Update the display accordingly.
             self._update_display()
             # Set the tick rate
@@ -91,15 +100,21 @@ class StarshipBattle:
         self._draw_bullets()
         self._update_bullets()
         self._refresh_bullets()
-        # Create and draw the alien fleet.
-        self._create_fleet()
+        # Draw the alien fleet.
         self._draw_fleet()
 
         # Draw the play_btn on top
         if not self.run:
             # Draw play button.
             self.play_btn.draw()
-
+        
+        # Draw the lives.
+        self.stats.draw_lives()
+        # Draw the scores.
+        self.scoreboard.draw_score()
+        self.scoreboard.draw_high_score()
+        # Draw the level.
+        self.stats.draw_level()
         # Update the display.
         pg.display.flip()
 
@@ -141,16 +156,13 @@ class StarshipBattle:
     
     def _create_fleet(self):
         """Create an alien fleet."""
-        if len(self.aliens) == 0:
-            self._delete_fleet()
-            self._empty_bullets()
-            test_alien = Alien(self, 0, 0)
-            num_col = (self.screen_rect.width // (2 * test_alien.rect.width)) - 4
-            num_row = self.screen_rect.height // (4 * test_alien.rect.height)
-            for y in range(num_row):
-                for x in range(num_col):
-                    alien = Alien(self, x*test_alien.rect.width*2, y*test_alien.rect.height*2)
-                    self.aliens.add(alien)
+        test_alien = Alien(self, 0, 0)
+        num_col = (self.screen_rect.width // (2 * test_alien.rect.width)) - 4
+        num_row = self.screen_rect.height // (4 * test_alien.rect.height)
+        for y in range(num_row):
+            for x in range(num_col):
+                alien = Alien(self, x*test_alien.rect.width*2, test_alien.rect.height + y*test_alien.rect.height*2)
+                self.aliens.add(alien)
 
     def _delete_fleet(self):
         """Wipe out the alien fleet."""
@@ -176,13 +188,55 @@ class StarshipBattle:
             alien.y += self.settings.ALIEN_FLEET_DROPLEN
             alien.rect.y = alien.y
 
-    def _detect_collision(self):
-        """Detect the collision between alien and bullet and kill the alien that was hit."""
+    def _detect_collisions(self):
+        """Detect collisions in the game."""
+        # Collision between alien and bullet.
         for alien in self.aliens.sprites():
             for bullet in self.bullets.sprites():
                 if pg.Rect.colliderect(alien.rect, bullet.rect):
                     self.bullets.remove(bullet)
                     self.aliens.remove(alien)
+                    self.scoreboard.current_score += self.settings.HIT_SCORE
+
+            # Collision between ship and alien.
+            if pg.Rect.colliderect(alien.rect, self.ship.rect) and self.stats.CURRENT_LIVES > 0:
+                self.stats.CURRENT_LIVES -= 1
+                self.stats.lives.remove(self.stats.lives.sprites()[-1])
+                self._delete_fleet()
+                self._empty_bullets()
+                self._create_fleet()
+                timesleep(1.5)
+    
+    def _update_game_stats(self):
+        """Update the game stats."""
+        # Reset the game stats when the player has zero lives.
+        if self.stats.CURRENT_LIVES == 0:
+            self.run = False
+            self.stats.CURRENT_LIVES = self.stats.MAX_LIVES
+            self.stats.create_lives() # Recreate lives.
+            # Reset the current score to 0.
+            self.scoreboard.current_score = 0
+            # Reset the alien speed.
+            self.settings.ALIEN_VELOCITY = self.settings.ALIEN_DEFAULT_VELOCITY   
+            # Write the high scores.
+            self.scoreboard.write_high_score()
+            # Reset the level.
+            self.stats.level.level = 0
+            # Reset the hit score.
+            self.settings.HIT_SCORE = self.settings.HIT_SCORE_DEFAULT
+
+        # Update the high score if the curren_score is more than the high score.
+        if self.scoreboard.current_score > self.scoreboard.high_score:
+            self.scoreboard.high_score = self.scoreboard.current_score
+
+        # Update the levels.
+        if len(self.aliens) == 0:
+            self._delete_fleet()
+            self._empty_bullets()
+            self.stats.level.level += 1
+            self.settings.ALIEN_VELOCITY *= self.settings.ALIEN_VELOCITY_FACTOR
+            self.settings.HIT_SCORE = round(self.settings.HIT_SCORE * self.settings.SCORE_MULTIPLIER)
+            self._create_fleet()
         
    
 if __name__ == '__main__':

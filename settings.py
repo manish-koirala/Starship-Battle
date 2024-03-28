@@ -13,21 +13,31 @@ class Settings:
         self.SCREEN_BG_COLOR = (20, 20, 20) # Black
 
         # Ship Attributes
-        self.SHIP_SPEED = 10
+        self.SHIP_SPEED = 12.5
 
         # Bullet Attributes.
-        self.BULLET_HEIGHT = 2
-        self.BULLET_WIDTH = 100
+        self.BULLET_HEIGHT = 1
+        self.BULLET_WIDTH = 400
         self.BULLET_COLOR = (255, 110, 100) # Red.
-        self.BULLET_LIMIT = 5
-        self.BULLET_VELOCITY = 8
+        self.BULLET_LIMIT = 4
+        self.BULLET_VELOCITY = 7.5
 
         # Alien and Fleet Static Attributes
-        self.ALIEN_FLEET_DROPLEN = 14
+        self.ALIEN_FLEET_DROPLEN = 24
+
+        # MAX_LIVES
+        self.MAX_LIVES = 3
 
     def initialize_dynamic_settings(self):
         """Initialize the dynamic settings within the game."""
         # Alien and Fleet Dynamic Attributes.
+        self.ALIEN_DEFAULT_VELOCITY = 3.5
         self.ALIEN_VELOCITY = 3.5 # positive value is left, negative value is right.
+        self.ALIEN_VELOCITY_FACTOR = 1.1
+
+        # Score Multiplier
+        self.HIT_SCORE_DEFAULT = 10
+        self.HIT_SCORE = 10
+        self.SCORE_MULTIPLIER = 2.5
 
 
