@@ -12,6 +12,9 @@ class Settings:
         self.SCREEN_HEIGHT = 800
         self.SCREEN_BG_COLOR = (0, 0, 0) # Black
 
+        # Sound Attributes
+        self.SOUND_VOLUME = 0.7
+
         # Ship Attributes
         self.SHIP_SPEED = 12.5
 

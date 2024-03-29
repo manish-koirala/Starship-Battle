@@ -13,6 +13,7 @@ class StarshipBattle:
     """A class that represents the main game."""
     def __init__(self):
         pg.init()
+        pg.mixer.init()
         self.settings = Settings()
         self.screen = pg.display.set_mode((self.settings.SCREEN_WIDTH, self.settings.SCREEN_HEIGHT))
         self.screen_rect = self.screen.get_rect()
@@ -28,6 +29,9 @@ class StarshipBattle:
         self.stats = Stats(self)
         self.scoreboard = ScoreBoard(self)
         self._create_fleet()
+        self.shoot_sound = pg.mixer.Sound("./assets/sounds/shoot.mp3")
+        self.explode_sound = pg.mixer.Sound("./assets/sounds/explode.mp3")
+        pg.mixer.music.set_volume(self.settings.SOUND_VOLUME)
 
     def run_game(self):
         """Run the game."""
@@ -125,6 +129,7 @@ class StarshipBattle:
         if len(self.bullets) < self.settings.BULLET_LIMIT:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
+            pg.mixer.Sound.play(self.shoot_sound)
 
     def _draw_bullets(self):
         """Draw all the bullets in the bullets group."""
@@ -197,6 +202,7 @@ class StarshipBattle:
                     self.bullets.remove(bullet)
                     self.aliens.remove(alien)
                     self.scoreboard.current_score += self.settings.HIT_SCORE
+                    pg.mixer.Sound.play(self.explode_sound)
 
             # Collision between ship and alien.
             if pg.Rect.colliderect(alien.rect, self.ship.rect) and self.stats.CURRENT_LIVES > 0:
@@ -205,6 +211,7 @@ class StarshipBattle:
                 self._delete_fleet()
                 self._empty_bullets()
                 self._create_fleet()
+                pg.mixer.Sound.play(self.explode_sound)
                 timesleep(1.5)
     
     def _update_game_stats(self):
