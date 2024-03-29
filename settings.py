@@ -10,14 +10,14 @@ class Settings:
         # Screen Attributes
         self.SCREEN_WIDTH = 1024
         self.SCREEN_HEIGHT = 800
-        self.SCREEN_BG_COLOR = (20, 20, 20) # Black
+        self.SCREEN_BG_COLOR = (0, 0, 0) # Black
 
         # Ship Attributes
         self.SHIP_SPEED = 12.5
 
         # Bullet Attributes.
-        self.BULLET_HEIGHT = 1
-        self.BULLET_WIDTH = 400
+        self.BULLET_HEIGHT = 12.5
+        self.BULLET_WIDTH = 2
         self.BULLET_COLOR = (255, 110, 100) # Red.
         self.BULLET_LIMIT = 4
         self.BULLET_VELOCITY = 7.5
@@ -33,11 +33,13 @@ class Settings:
         # Alien and Fleet Dynamic Attributes.
         self.ALIEN_DEFAULT_VELOCITY = 3.5
         self.ALIEN_VELOCITY = 3.5 # positive value is left, negative value is right.
-        self.ALIEN_VELOCITY_FACTOR = 1.1
+        self.ALIEN_VELOCITY_FACTOR = 1.12
+        self.ALIEN_VELOCITY_MAX = 12.5
 
         # Score Multiplier
         self.HIT_SCORE_DEFAULT = 10
         self.HIT_SCORE = 10
-        self.SCORE_MULTIPLIER = 2.5
+        self.SCORE_MULTIPLIER = 1.25
+        self.HIT_SCORE_MAX = 100
 
 

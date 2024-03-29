@@ -234,8 +234,10 @@ class StarshipBattle:
             self._delete_fleet()
             self._empty_bullets()
             self.stats.level.level += 1
-            self.settings.ALIEN_VELOCITY *= self.settings.ALIEN_VELOCITY_FACTOR
-            self.settings.HIT_SCORE = round(self.settings.HIT_SCORE * self.settings.SCORE_MULTIPLIER)
+            if self.settings.ALIEN_VELOCITY < self.settings.ALIEN_VELOCITY_MAX:
+                self.settings.ALIEN_VELOCITY *= self.settings.ALIEN_VELOCITY_FACTOR
+            if self.settings.HIT_SCORE < self.settings.HIT_SCORE_MAX:
+                self.settings.HIT_SCORE = round(self.settings.HIT_SCORE * self.settings.SCORE_MULTIPLIER)
             self._create_fleet()
         
    
